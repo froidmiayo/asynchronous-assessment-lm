@@ -12,28 +12,50 @@ namespace asynchronous_assessment_lm
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Coffee cup = PourCoffee();
-            Console.WriteLine("Coffee is ready");
-
-            Egg eggs = FryEggs(2);
-            Console.WriteLine("Eggs are ready");
-
-            Bacon bacon = FryBacon(3);
-            Console.WriteLine("Bacon is ready");
-
-            Toast toast = ToastBread(2);
-            ApplyButter(toast);
-            ApplyJam(toast);
-            Console.WriteLine("toast is ready");
-
-            Juice orange = PourOJ();
-            Console.WriteLine("Orange juice is ready");
+            var coffee = PrepareCoffee();
+            var juice = PrepareOrangeJuice();
+            var eggs = PrepareEgg(2);
+            var bacons = PrepareBacon(3);
+            var toasts = PrepareToast(2);
+            await Task.WhenAll( eggs, bacons, toasts, coffee, juice);
             Console.WriteLine("Breakfast is ready!");
+        }
+
+        private static Task<Coffee> PrepareCoffee()
+        {
+            var coffee = PourCoffee();
+            Console.WriteLine("Coffee is ready");
+            return Task.FromResult(coffee);
 
         }
 
+        private static Task<Juice> PrepareOrangeJuice() 
+        {
+            var juice = PourOJ();
+            Console.WriteLine("Orange juice is ready");
+            return Task.FromResult(juice);
+        }
+
+        private static async Task PrepareEgg(int count)
+        {
+            await FryEggs(count);
+            Console.WriteLine("Eggs are ready");
+        }
+        private static async Task PrepareBacon(int slices)
+        {
+            await FryBacon(slices);
+            Console.WriteLine("Bacon is ready");
+        }
+
+        private static async Task PrepareToast(int slices)
+        {
+            var toast = await ToastBread(slices);
+            ApplyButter(toast);
+            ApplyJam(toast);
+            Console.WriteLine("toast is ready");
+        }
         private static Juice PourOJ()
         {
             Console.WriteLine("Pouring orange juice");
@@ -46,42 +68,42 @@ namespace asynchronous_assessment_lm
         private static void ApplyButter(Toast toast) =>
             Console.WriteLine("Putting butter on the toast");
 
-        private static Toast ToastBread(int slices)
+        private static async Task<Toast> ToastBread(int slices)
         {
-            for (int slice = 0; slice < slices; slice++)
+            for (var slice = 0; slice < slices; slice++)
             {
                 Console.WriteLine("Putting a slice of bread in the toaster");
             }
             Console.WriteLine("Start toasting...");
-            Task.Delay(3000).Wait();
+            await Task.Delay(3000);
             Console.WriteLine("Remove toast from toaster");
 
             return new Toast();
         }
 
-        private static Bacon FryBacon(int slices)
+        private static async Task<Bacon> FryBacon(int slices)
         {
             Console.WriteLine($"putting {slices} slices of bacon in the pan");
             Console.WriteLine("cooking first side of bacon...");
-            Task.Delay(3000).Wait();
-            for (int slice = 0; slice < slices; slice++)
+            await Task.Delay(3000);
+            for (var slice = 0; slice < slices; slice++)
             {
                 Console.WriteLine("flipping a slice of bacon");
             }
             Console.WriteLine("cooking the second side of bacon...");
-            Task.Delay(3000).Wait();
+            await Task.Delay(3000);
 
 
             return new Bacon();
         }
 
-        private static Egg FryEggs(int count)
+        private static async Task<Egg> FryEggs(int count)
         {
             Console.WriteLine("Warming the egg pan...");
-            Task.Delay(3000).Wait();
+            await Task.Delay(3000);
             Console.WriteLine($"cracking {count} eggs");
             Console.WriteLine("cooking the eggs ...");
-            Task.Delay(3000).Wait();
+            await Task.Delay(3000);
             Console.WriteLine("Put eggs on plate");
 
             return new Egg();
